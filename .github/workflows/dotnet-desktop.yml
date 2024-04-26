@@ -13,9 +13,6 @@ jobs:
 
   build:
 
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -32,20 +29,32 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-   #run command dotnet build
-    - name: Build
-      run: dotnet build ${{ matrix.configuration }}
+      #run command dotnet build
+    - name: Build linux
+      run: dotnet publish -r linux-x64 --self-contained true
+
+      #run command dotnet build
+    - name: Build linux
+      run: dotnet publish -r win-x64 --self-contained true
 
        # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.configuration }}
+        name: bin
         path: BadExe/bin/
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: BadExe/bin/
-        asset_name: ${{ matrix.configuration }}
+        file: BadExe/bin/Release/net8.0-windows/win-x64/publish/BadExe.exe
+        asset_name: windows
+        tag: ${{ github.ref }}
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: BadExe/bin/Release/net8.0-windows/linux-x64/publish/BadExe
+        asset_name: linux
         tag: ${{ github.ref }}
