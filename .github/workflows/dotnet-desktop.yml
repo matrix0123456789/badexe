@@ -3,8 +3,11 @@ name: .NET Core Desktop
 on:
   push:
     branches: [ "master" ]
+    tags:
+      - '*'
   pull_request:
     branches: [ "master" ]
+
 
 jobs:
 
@@ -31,11 +34,18 @@ jobs:
 
    #run command dotnet build
     - name: Build
-      run: dotnet build
+      run: dotnet build ${{ matrix.configuration }}
 
        # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: WindowsApp
+        name: ${{ matrix.configuration }}
         path: BadExe/bin/
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: BadExe/bin/
+        asset_name: ${{ matrix.configuration }}
+        tag: ${{ github.ref }}
