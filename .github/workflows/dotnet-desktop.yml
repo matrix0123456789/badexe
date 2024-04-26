@@ -38,4 +38,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: WindowsApp
-        path: BadExe/bin/$(BuildConfiguration)/net8.0-windows/BadExe.exe
+        path: BadExe/bin/
