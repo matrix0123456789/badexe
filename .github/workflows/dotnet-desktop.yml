@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: bin
-          path: BadExe/bin/Release/net8.0-windows/win-x64/publish
+          path: BadExe/
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
