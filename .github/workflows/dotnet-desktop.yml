@@ -30,8 +30,8 @@ jobs:
         dotnet-version: 8.0.x
 
       #run command dotnet build
-    - name: Build linux
-      run: dotnet publish -r linux-x64 --self-contained true
+#    - name: Build linux
+#      run: dotnet publish -r linux-x64 --self-contained true
 
       #run command dotnet build
     - name: Build linux
@@ -51,10 +51,10 @@ jobs:
         asset_name: windows
         tag: ${{ github.ref }}
 
-    - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: BadExe/bin/Release/net8.0-windows/linux-x64/publish/BadExe
-        asset_name: linux
-        tag: ${{ github.ref }}
+#    - name: Upload binaries to release
+#      uses: svenstaro/upload-release-action@v2
+#      with:
+#        repo_token: ${{ secrets.GITHUB_TOKEN }}
+#        file: BadExe/bin/Release/net8.0-windows/linux-x64/publish/BadExe
+#        asset_name: linux
+#        tag: ${{ github.ref }}
