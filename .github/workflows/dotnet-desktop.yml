@@ -34,7 +34,7 @@ jobs:
 #      run: dotnet publish -r linux-x64 --self-contained true
 
       #run command dotnet build
-    - name: Build linux
+    - name: Build windows
       run: dotnet publish -r win-x64 --self-contained true
 
        # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
@@ -42,7 +42,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: bin
-        path: BadExe/bin/
+        path: BadExe/bin/Release/net8.0-windows/win-x64/publish
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
