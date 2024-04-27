@@ -33,7 +33,7 @@ jobs:
         with:
           name: bin
           path: BadExe/
-          
+
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
